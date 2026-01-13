@@ -1,0 +1,17 @@
+{
+  "Group": "steventhorne",
+  "Name": "Quickstacker",
+  "Version": "1.0.0",
+  "Authors": [
+    {
+      "Name": "steventhorne",
+      "Email": "",
+      "Url": "https://github.com/steventhorne"
+    }
+  ],
+  "Website": "https://github.com/steventhorne/hytale-quick-stacker",
+  "Main": "dev.sthorne.hytale.plugins.quickstacker.Plugin",
+  "ServerVersion": "*",
+  "Dependencies": {
+  }
+}
