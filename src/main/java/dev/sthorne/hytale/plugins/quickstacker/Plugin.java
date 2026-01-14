@@ -12,5 +12,6 @@ public class Plugin extends JavaPlugin {
     @Override
     protected void setup() {
         getCommandRegistry().registerCommand(new StackToNearbyCommand());
+        getCommandRegistry().registerCommand(new StackToPlayerCommand());
     }
 }
