@@ -9,7 +9,7 @@
       "Url": "https://github.com/steventhorne"
     }
   ],
-  "Website": "https://github.com/steventhorne/hytale-quick-stacker",
+  "Website": "https://github.com/steventhorne/hytale-quickstacker",
   "Main": "dev.sthorne.hytale.plugins.quickstacker.Plugin",
   "ServerVersion": "*",
   "Dependencies": {

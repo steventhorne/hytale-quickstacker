@@ -30,19 +30,15 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
 
     protected void getNearbyChests(Player player)
     {
-        var playerRef = player.getReference();
         var world = player.getWorld();
-        if (world == null || playerRef == null) return;
+        if (world == null) return;
 
-        var store = player.getWorld().getEntityStore().getStore();
-
-        var transform = store.getComponent(playerRef, TransformComponent.getComponentType());
+        var transform = GetPlayerTransform(player);
         if (transform == null) return;
 
         var posX = (int)transform.getPosition().x;
         var posY = (int)transform.getPosition().y;
         var posZ = (int)transform.getPosition().z;
-        player.sendMessage(Message.raw("x: " + posX + ", y: " + posY + ", z: " + posZ));
         var inventory = player.getInventory();
         if (inventory == null) return;
 
@@ -62,5 +58,14 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
             }
         }
         player.sendMessage(Message.raw("Successfully quick stacked to " + chestCount + " nearby chests."));
+    }
+
+    protected TransformComponent GetPlayerTransform(Player player) {
+        var playerRef = player.getReference();
+        var world = player.getWorld();
+        if (world == null || playerRef == null) return null;
+
+        var store = world.getEntityStore().getStore();
+        return store.getComponent(playerRef, TransformComponent.getComponentType());
     }
 }
