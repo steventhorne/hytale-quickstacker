@@ -13,13 +13,17 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class StackToNearbyCommand extends AbstractPlayerCommand {
-    protected static final int RADIUS = 10;
+    private final Config<PluginConfig> Config;
 
-    public StackToNearbyCommand() {
+    public StackToNearbyCommand(Config<PluginConfig> config) {
         super("stack", "stack to nearby chests");
+
+        Config = config;
+
         setPermissionGroup(GameMode.Adventure);
     }
 
@@ -50,15 +54,25 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
         if (inventory == null) return 0;
 
         int chestCount = 0;
-        for (int x = posX - RADIUS; x < posX + RADIUS; x++) {
-            for (int y = posY - RADIUS; y < posY + RADIUS; y++) {
-                for (int z = posZ - RADIUS; z < posZ + RADIUS; z++) {
+        int maxRadius = Config.get().GetStackToChestRange();
+        for (int x = posX - maxRadius; x < posX + maxRadius; x++) {
+            for (int y = posY - maxRadius; y < posY + maxRadius; y++) {
+                for (int z = posZ - maxRadius; z < posZ + maxRadius; z++) {
+                    var dx = posX - x;
+                    var dy = posY - y;
+                    var dz = posZ - z;
+                    var distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (distance > maxRadius) continue;
+
                     WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(x, z));
                     if (chunk == null) continue;
 
                     var blockState = chunk.getState(x, y, z);
                     if (blockState instanceof ItemContainerState containerState) {
-                        inventory.getCombinedHotbarFirst().quickStackTo(containerState.getItemContainer());
+                        if (Config.get().GetIncludeHotbar())
+                            inventory.getCombinedHotbarFirst().quickStackTo(containerState.getItemContainer());
+                        else
+                            inventory.getStorage().quickStackTo(containerState.getItemContainer());
                         chestCount++;
                     }
                 }

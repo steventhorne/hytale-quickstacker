@@ -9,21 +9,23 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class StackToPlayerCommand extends AbstractPlayerCommand {
-    protected static final int RADIUS = 10;
-
     private static final Message MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR = Message.raw("An unknown error has occurred.");
 
+    private final Config<PluginConfig> Config;
     private final RequiredArg<PlayerRef> Argument;
 
-    public StackToPlayerCommand() {
+    public StackToPlayerCommand(Config<PluginConfig> config) {
         super("playerstack", "stack to a nearby player");
+
+        Config = config;
+
         this.addAliases("pstack", "stackplayer", "stackp");
         this.Argument = this.withRequiredArg("p", "Quick stacks to this player's inventory if nearby.", ArgTypes.PLAYER_REF);
         setPermissionGroup(GameMode.Adventure);
@@ -64,13 +66,20 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
         var srcPos = srcTransform.getPosition();
         var targetPos = targetTransform.getPosition();
 
-        var dx = srcPos.x - targetPos.x;
-        var dy = srcPos.y - targetPos.y;
-        var dz = srcPos.z - targetPos.z;
-        var distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
-        if (distance > RADIUS) return Message.raw("Target player is too far.");
+        var maxRadius = Config.get().GetStackToPlayerRange();
+        if (maxRadius > 0) {
+            var dx = srcPos.x - targetPos.x;
+            var dy = srcPos.y - targetPos.y;
+            var dz = srcPos.z - targetPos.z;
+            var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (distance > Config.get().GetStackToPlayerRange()) return Message.raw("Target player is too far.");
+        }
 
         srcInv.getCombinedHotbarFirst().quickStackTo(targetInv.getCombinedHotbarFirst());
+        if (Config.get().GetIncludeHotbar())
+            srcInv.getCombinedHotbarFirst().quickStackTo(targetInv.getCombinedHotbarFirst());
+        else
+            srcInv.getStorage().quickStackTo(targetInv.getCombinedHotbarFirst());
         return Message.raw("Quick stacked to " + target.getDisplayName() + "'s inventory.");
     }
 }
