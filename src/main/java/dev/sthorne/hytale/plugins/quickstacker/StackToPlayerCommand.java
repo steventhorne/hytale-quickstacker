@@ -9,11 +9,16 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
+import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
+import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+
+import java.awt.*;
 
 public class StackToPlayerCommand extends AbstractPlayerCommand {
     private static final Message MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR = Message.raw("An unknown error has occurred.");
@@ -22,11 +27,18 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
     private final RequiredArg<PlayerRef> Argument;
 
     public StackToPlayerCommand(Config<PluginConfig> config) {
-        super("playerstack", "stack to a nearby player");
+        this(config, false);
+    }
+    public StackToPlayerCommand(Config<PluginConfig> config, boolean deprecated) {
+        var name = deprecated ? "playerstack" : "player";
+        super(name, "Quick stack to a nearby player.");
 
         Config = config;
 
-        this.addAliases("pstack", "stackplayer", "stackp");
+        if (deprecated) {
+            this.addAliases("pstack", "stackplayer", "stackp");
+        }
+
         this.Argument = this.withRequiredArg("p", "Quick stacks to this player's inventory if nearby.", ArgTypes.PLAYER_REF);
         setPermissionGroup(GameMode.Adventure);
     }
@@ -34,6 +46,12 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
     @Override
     protected void execute(@NonNullDecl CommandContext commandContext, @NonNullDecl Store<EntityStore> store, @NonNullDecl Ref<EntityStore> ref, @NonNullDecl PlayerRef playerRef, @NonNullDecl World world) {
         if (!commandContext.isPlayer()) return;
+        if (!commandContext.getInputString().toLowerCase().startsWith("quickstack") && !commandContext.getInputString().toLowerCase().startsWith("qs")) {
+            var deprecationMessage = Message.raw("/" + commandContext.getInputString() + " is deprecated and will be removed. Please use the /qs or /quickstack command.");
+            deprecationMessage.color(Color.YELLOW);
+            commandContext.sendMessage(deprecationMessage);
+        }
+
         var srcPlayer = (Player) commandContext.sender();
         var targetPlayerRef = commandContext.get(this.Argument);
         if (targetPlayerRef == null) return;
@@ -75,11 +93,18 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
             if (distance > Config.get().GetStackToPlayerRange()) return Message.raw("Target player is too far.");
         }
 
-        srcInv.getCombinedHotbarFirst().quickStackTo(targetInv.getCombinedHotbarFirst());
+        ListTransaction<MoveTransaction<ItemStackTransaction>> transaction;
         if (Config.get().GetIncludeHotbar())
-            srcInv.getCombinedHotbarFirst().quickStackTo(targetInv.getCombinedHotbarFirst());
+            transaction = srcInv.getCombinedHotbarFirst().quickStackTo(targetInv.getCombinedHotbarFirst());
         else
-            srcInv.getStorage().quickStackTo(targetInv.getCombinedHotbarFirst());
-        return Message.raw("Quick stacked to " + target.getDisplayName() + "'s inventory.");
+            transaction = srcInv.getStorage().quickStackTo(targetInv.getCombinedHotbarFirst());
+
+        var itemCount = Utils.GetMovedItemQuantityFromTransaction(transaction);
+        if (itemCount > 0) {
+            target.sendMessage(Message.raw(src.getDisplayName() + " quick stacked " + itemCount + " items to your inventory."));
+            return Message.raw("Successfully quick stacked " + itemCount + " items to " + target.getDisplayName() + "'s inventory.");
+        }
+        else
+            return Message.raw("No items capable of being quick stacked.");
     }
 }

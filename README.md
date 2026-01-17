@@ -1,13 +1,10 @@
 This is a simple quality of life mod that adds a command to quick stack to nearby chests or players.
 
-Simply type `/stack` and you will automatically stack to any inventory within a 10 block radius.
+Simply type `/quickstack` or `/qs` and you will automatically stack to any inventory within a 10 block radius.
 
 Similarly, this mod also contains the ability to quick stack to nearby players. This can be helpful if you're out with another player and want to consolidate inventory space.
-Simply type `/playerstack <player name>` to quick stack to any player within a 10 block radius. You can also use any of the following aliases of the command:
-- `/playerstack <name>`
-- `/pstack <name>`
-- `/stackplayer <name>`
-- `/stackp <name>`
+
+Simply type `/qs player <name>` to quick stack to any player within a 10 block radius.
 
 # Installation
 Plugins can be installed by placing them in the `%appdata%/Hytale/UserData/Mods` directory. If the folder doesn't exist, you can create this manually.
@@ -21,8 +18,13 @@ These options can be found in the `Quickstacker.json` file located in the `steve
 - `IncludeHotbar` (default: false) - If true, quick stacking will also quick stack items on the players hot bar.
 
 ## Troubleshooting
+
+### I do not have permission to use the command
 You do not need OP permissions, this is enabled by default for any Adventure player.
 
 Be sure to enable it for your world by right-clicking on the world and enabling Quickstacker in the Mods list. If it does not appear in that list, you may have copied the file to the wrong location.
 
 If you get a message saying that you don't have permission, this usually means the mod is either not installed in the correct mods folder, or it's not enabled for the world.
+
+### My stuff disappeared but did not go into a nearby chest
+If you've increased the radius configuration to a really high number, then it's possible that you quick stacked to a world generated chest that spawns with random items inside.
