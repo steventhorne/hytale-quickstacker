@@ -1,7 +1,7 @@
 {
   "Group": "steventhorne",
   "Name": "Quickstacker",
-  "Version": "1.1.2",
+  "Version": "1.2.0",
   "Authors": [
     {
       "Name": "steventhorne",
@@ -13,5 +13,7 @@
   "Main": "dev.sthorne.hytale.plugins.quickstacker.Plugin",
   "ServerVersion": "*",
   "Dependencies": {
-  }
+  },
+  "IncludesAssetPack": true,
+  "DisabledByDefault": false
 }

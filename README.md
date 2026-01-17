@@ -6,6 +6,9 @@ Similarly, this mod also contains the ability to quick stack to nearby players. 
 
 Simply type `/qs player <name>` to quick stack to any player within a 10 block radius.
 
+Additionally, this mod contains a custom block that can be crafted at the Workbench in the Tinkering tab.
+Interacting with this block will quick stack to nearby chests, saving you the hassle of typing a command.
+
 # Installation
 Plugins can be installed by placing them in the `%appdata%/Hytale/UserData/Mods` directory. If the folder doesn't exist, you can create this manually.
 

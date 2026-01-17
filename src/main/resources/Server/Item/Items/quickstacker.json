@@ -1,0 +1,73 @@
+{
+  "TranslationProperties": {
+    "Name": "items.quickstacker.name"
+  },
+  "ItemLevel": 0,
+  "Set": "",
+  "Icon": "Icons/ItemsGenerated/Quickstacker.png",
+  "IconProperties": {
+    "Scale": 0.3,
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "Translation": [
+      0,
+      0
+    ]
+  },
+  "MaxStack": 1,
+  "Categories": [
+    "Blocks.Deco"
+  ],
+  "PlayerAnimationsId": "Block",
+  "Recipe": {
+    "TimeSeconds": 1,
+    "KnowledgeRequired": false,
+    "Input": [
+      {
+        "Quantity": 20,
+        "ResourceTypeId": "Wood_All"
+      }
+    ],
+    "OutputQuantity": 1,
+    "BenchRequirement": [
+      {
+        "Id": "Workbench",
+        "Type": "Crafting",
+        "Categories": [
+          "Workbench_Tinkering"
+        ]
+      }
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Wood",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Group": "",
+    "BlockSoundSetId": "Wood",
+    "BlockParticleSetId": "Wood",
+    "BiomeTintUp": 0,
+    "CustomModel": "Blocks/Tinkering/Quickstacker.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/Tinkering/Quickstacker.png"
+      }
+
+    ],
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "Woods"
+      }
+    },
+    "Flags": {
+      "IsUsable": true
+    },
+    "Opacity": "Transparent",
+    "Interactions": {
+      "Use": "Steventhorne_Quickstacker_QuickStack"
+    }
+  }
+}

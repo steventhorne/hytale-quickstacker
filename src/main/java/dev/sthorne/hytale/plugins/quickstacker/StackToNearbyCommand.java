@@ -48,7 +48,7 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
     }
 
 
-    protected void quickStackToNearbyChests(Player player)
+    public static void quickStackToNearbyChests(Player player)
     {
         var world = player.getWorld();
         if (world == null) return;
@@ -65,7 +65,7 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
         int availableChests = 0;
         int chestCount = 0;
         int itemCount = 0;
-        int maxRadius = Config.get().GetStackToChestRange();
+        int maxRadius = Plugin.Config.get().GetStackToChestRange();
         for (int x = posX - maxRadius; x < posX + maxRadius; x++) {
             for (int y = posY - maxRadius; y < posY + maxRadius; y++) {
                 for (int z = posZ - maxRadius; z < posZ + maxRadius; z++) {
@@ -81,7 +81,7 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
                         if (distance > maxRadius) continue;
 
                         ListTransaction<MoveTransaction<ItemStackTransaction>> transaction;
-                        if (Config.get().GetIncludeHotbar())
+                        if (Plugin.Config.get().GetIncludeHotbar())
                             transaction = inventory.getCombinedHotbarFirst().quickStackTo(containerState.getItemContainer());
                         else
                             transaction = inventory.getStorage().quickStackTo(containerState.getItemContainer());
