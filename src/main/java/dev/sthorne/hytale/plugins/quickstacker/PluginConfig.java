@@ -17,10 +17,10 @@ public class PluginConfig {
                     (config, _) -> config.IncludeHotbar).add()
             .build();
 
-    private int StackToChestRange = 10;
+    private int StackToChestRange = 14;
     public int GetStackToChestRange() { return StackToChestRange; }
 
-    private int StackToPlayerRange = 10;
+    private int StackToPlayerRange = 14;
     public int GetStackToPlayerRange() { return StackToPlayerRange; }
 
     private boolean IncludeHotbar = false;

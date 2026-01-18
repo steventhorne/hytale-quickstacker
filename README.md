@@ -1,13 +1,16 @@
-This is a simple quality of life mod that adds a command to quick stack to nearby chests or players.
+This is a quality of life mod that adds a block for quick stacking to nearby chests. It also adds commands to quick stack to nearby chests or players.
 
-Simply type `/quickstack` or `/qs` and you will automatically stack to any inventory within a 10 block radius.
+The range of these can be configured.
+
+# Assets
+This mod contains a custom block that can be crafted at the Workbench in the Tinkering tab. Interacting with this block will quick stack to nearby chests, saving you the hassle of typing a command.
+
+# Commands
+Type `/quickstack` or `/qs` and you will automatically stack to any inventory within a 10 block radius.
 
 Similarly, this mod also contains the ability to quick stack to nearby players. This can be helpful if you're out with another player and want to consolidate inventory space.
 
-Simply type `/qs player <name>` to quick stack to any player within a 10 block radius.
-
-Additionally, this mod contains a custom block that can be crafted at the Workbench in the Tinkering tab.
-Interacting with this block will quick stack to nearby chests, saving you the hassle of typing a command.
+Type `/qs player <name>` to quick stack to any player within a 10 block radius.
 
 # Installation
 Plugins can be installed by placing them in the `%appdata%/Hytale/UserData/Mods` directory. If the folder doesn't exist, you can create this manually.
@@ -16,9 +19,9 @@ Plugins can be installed by placing them in the `%appdata%/Hytale/UserData/Mods`
 There are a few config options available once you've run the server with the mod enable at least once.
 These options can be found in the `Quickstacker.json` file located in the `steventhorne_Quickstacker` directory within the mods folder.
 
-- `StackToChestRange` (default: 10) - The max range a chest can be from the player to quick stack to.
-- `StackToPlayerRage` (default: 10) - The max range a player can be from the player to quick stack to. A negative value gives unlimited range.
-- `IncludeHotbar` (default: false) - If true, quick stacking will also quick stack items on the players hot bar.
+*   `StackToChestRange` (default: 10) - The max range a chest can be from the player to quick stack to.
+*   `StackToPlayerRage` (default: 10) - The max range a player can be from the player to quick stack to. A negative value gives unlimited range.
+*   `IncludeHotbar` (default: false) - If true, quick stacking will also quick stack items on the players hot bar.
 
 ## Troubleshooting
 
