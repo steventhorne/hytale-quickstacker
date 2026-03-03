@@ -5,18 +5,6 @@
   "ItemLevel": 0,
   "Set": "",
   "Icon": "Icons/ItemsGenerated/Quickstacker.png",
-  "IconProperties": {
-    "Scale": 0.3,
-    "Rotation": [
-      22.5,
-      45,
-      22.5
-    ],
-    "Translation": [
-      0,
-      0
-    ]
-  },
   "MaxStack": 1,
   "Categories": [
     "Blocks.Deco"

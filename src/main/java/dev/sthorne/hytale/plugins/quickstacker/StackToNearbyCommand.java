@@ -11,10 +11,10 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
+import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -50,6 +50,12 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
 
     public static void quickStackToNearbyChests(Player player)
     {
+        var ref = player.getReference();
+        if (ref == null) return;
+
+        var playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+        if (playerRef == null) return;
+
         var world = player.getWorld();
         if (world == null) return;
 
@@ -72,26 +78,30 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
                     WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(x, z));
                     if (chunk == null) continue;
 
-                    var blockState = chunk.getState(x, y, z);
-                    if (blockState instanceof ItemContainerState containerState) {
-                        var dx = posX - x;
-                        var dy = posY - y;
-                        var dz = posZ - z;
-                        var distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                        if (distance > maxRadius) continue;
+                    var blockRef = chunk.getBlockComponentEntity(x, y, z);
+                    if (blockRef == null) continue;
 
-                        ListTransaction<MoveTransaction<ItemStackTransaction>> transaction;
-                        if (Plugin.Config.get().GetIncludeHotbar())
-                            transaction = inventory.getCombinedHotbarFirst().quickStackTo(containerState.getItemContainer());
-                        else
-                            transaction = inventory.getStorage().quickStackTo(containerState.getItemContainer());
+                    var store = blockRef.getStore();
+                    var containerComponent = store.getComponent(blockRef, ItemContainerBlock.getComponentType());
+                    if (containerComponent == null) continue;
 
-                        var change = Utils.GetMovedItemQuantityFromTransaction(transaction);
-                        if (change > 0) chestCount++;
+                    var dx = posX - x;
+                    var dy = posY - y;
+                    var dz = posZ - z;
+                    var distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (distance > maxRadius) continue;
 
-                        itemCount += change;
-                        availableChests++;
-                    }
+                    ListTransaction<MoveTransaction<ItemStackTransaction>> transaction;
+                    if (Plugin.Config.get().GetIncludeHotbar())
+                        transaction = inventory.getCombinedHotbarFirst().quickStackTo(containerComponent.getItemContainer());
+                    else
+                        transaction = inventory.getStorage().quickStackTo(containerComponent.getItemContainer());
+
+                    var change = Utils.GetMovedItemQuantityFromTransaction(transaction);
+                    if (change > 0) chestCount++;
+
+                    itemCount += change;
+                    availableChests++;
                 }
             }
         }

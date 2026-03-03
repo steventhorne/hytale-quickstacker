@@ -12,10 +12,10 @@ import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerWi
 import com.hypixel.hytale.server.core.entity.entities.player.windows.Window;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -67,16 +67,20 @@ public class BrowseNearbyCommand extends AbstractPlayerCommand {
                     WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(x, z));
                     if (chunk == null) continue;
 
-                    var blockState = chunk.getState(x, y, z);
-                    if (blockState instanceof ItemContainerState containerState) {
-                        var dx = posX - x;
-                        var dy = posY - y;
-                        var dz = posZ - z;
-                        var distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                        if (distance > maxRadius) continue;
+                    var ref = chunk.getBlockComponentEntity(x, y, z);
+                    if (ref == null) continue;
 
-                        containers.add(containerState.getItemContainer());
-                    }
+                    var store = ref.getStore();
+                    var containerComponent = store.getComponent(ref, ItemContainerBlock.getComponentType());
+                    if (containerComponent == null) continue;
+
+                    var dx = posX - x;
+                    var dy = posY - y;
+                    var dz = posZ - z;
+                    var distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (distance > maxRadius) continue;
+
+                    containers.add(containerComponent.getItemContainer());
                 }
             }
         }
