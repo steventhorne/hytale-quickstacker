@@ -9,6 +9,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
@@ -17,8 +18,10 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class StackToPlayerCommand extends AbstractPlayerCommand {
     private static final Message MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR = Message.raw("An unknown error has occurred.");
@@ -40,7 +43,12 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
         }
 
         this.Argument = this.withRequiredArg("p", "Quick stacks to this player's inventory if nearby.", ArgTypes.PLAYER_REF);
-        setPermissionGroup(GameMode.Adventure);
+    }
+
+    @NullableDecl
+    @Override
+    protected String generatePermissionNode() {
+        return "playerstack";
     }
 
     @Override
@@ -52,7 +60,7 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
             commandContext.sendMessage(deprecationMessage);
         }
 
-        var srcPlayer = (Player) commandContext.sender();
+        var srcPlayer = (PlayerRef) commandContext.sender();
         var targetPlayerRef = commandContext.get(this.Argument);
         if (targetPlayerRef == null) return;
         var targetPlayer = Utils.GetPlayerFromRef(targetPlayerRef);
@@ -61,13 +69,22 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
             return;
         }
 
-        var result = quickStackToNearbyPlayer(srcPlayer, targetPlayer);
+        var result = quickStackToNearbyPlayer(srcPlayer, targetPlayer, targetPlayerRef);
         if (result != null) {
             commandContext.sendMessage(result);
         }
     }
 
-    protected Message quickStackToNearbyPlayer(Player src, Player target) {
+    protected Message quickStackToNearbyPlayer(PlayerRef srcPlayerRef, Player target, PlayerRef targetPlayerRef) {
+        var srcPlayerRefRef = srcPlayerRef.getReference();
+        if (srcPlayerRefRef == null) return MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR;
+        var src = srcPlayerRefRef.getStore().getComponent(srcPlayerRefRef, Player.getComponentType());
+        if (src == null) return MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR;
+
+        var srcRef = src.getReference();
+        var targetRef = target.getReference();
+        if (srcRef == null || targetRef == null) return MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR;
+
         var srcWorld = src.getWorld();
         var targetWorld = target.getWorld();
         if (srcWorld == null || targetWorld == null) return MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR;
@@ -76,10 +93,6 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
         var srcTransform = Utils.GetPlayerTransform(src);
         var targetTransform = Utils.GetPlayerTransform(target);
         if (srcTransform == null || targetTransform == null) return MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR;
-
-        var srcInv = src.getInventory();
-        var targetInv = target.getInventory();
-        if (srcInv == null || targetInv == null) return MESSAGE_COMMANDS_ERRORS_UNKNOWN_ERROR;
 
         var srcPos = srcTransform.getPosition();
         var targetPos = targetTransform.getPosition();
@@ -94,15 +107,21 @@ public class StackToPlayerCommand extends AbstractPlayerCommand {
         }
 
         ListTransaction<MoveTransaction<ItemStackTransaction>> transaction;
-        if (Config.get().GetIncludeHotbar())
-            transaction = srcInv.getCombinedHotbarFirst().quickStackTo(targetInv.getCombinedHotbarFirst());
-        else
-            transaction = srcInv.getStorage().quickStackTo(targetInv.getCombinedHotbarFirst());
+        if (Config.get().GetIncludeHotbar()) {
+            var srcInv = InventoryComponent.getCombined(srcRef.getStore(), srcRef, InventoryComponent.HOTBAR_FIRST);
+            var targetInv = InventoryComponent.getCombined(targetRef.getStore(), targetRef, InventoryComponent.HOTBAR_FIRST);
+            transaction = srcInv.quickStackTo(targetInv);
+        }
+        else {
+            var srcInv = InventoryComponent.getCombined(srcRef.getStore(), srcRef, Objects.requireNonNull(InventoryComponent.getComponentTypeById(InventoryComponent.STORAGE_SECTION_ID)));
+            var targetInv = InventoryComponent.getCombined(targetRef.getStore(), targetRef, InventoryComponent.HOTBAR_FIRST);
+            transaction = srcInv.quickStackTo(targetInv);
+        }
 
         var itemCount = Utils.GetMovedItemQuantityFromTransaction(transaction);
         if (itemCount > 0) {
-            target.sendMessage(Message.raw(src.getDisplayName() + " quick stacked " + itemCount + " items to your inventory."));
-            return Message.raw("Successfully quick stacked " + itemCount + " items to " + target.getDisplayName() + "'s inventory.");
+            targetPlayerRef.sendMessage(Message.raw(srcPlayerRef.getUsername() + " quick stacked " + itemCount + " items to your inventory."));
+            return Message.raw("Successfully quick stacked " + itemCount + " items to " + targetPlayerRef.getUsername() + "'s inventory.");
         }
         else
             return Message.raw("No items capable of being quick stacked.");

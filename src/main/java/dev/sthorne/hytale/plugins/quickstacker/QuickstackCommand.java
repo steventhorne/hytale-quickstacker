@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 public class QuickstackCommand extends AbstractPlayerCommand {
     private final StackToNearbyCommand NearbyCommand;
@@ -21,10 +22,15 @@ public class QuickstackCommand extends AbstractPlayerCommand {
         // commented out until scrolling support added to Inventory window
         // this.addSubCommand(new BrowseNearbyCommand(config));
 
-        NearbyCommand = new StackToNearbyCommand(config);
-
-        setPermissionGroup(GameMode.Adventure);
+        NearbyCommand = new StackToNearbyCommand();
     }
+
+    @NullableDecl
+    @Override
+    protected String generatePermissionNode() {
+        return "quickstack";
+    }
+
     @Override
     protected void execute(@NonNullDecl CommandContext commandContext, @NonNullDecl Store<EntityStore> store, @NonNullDecl Ref<EntityStore> ref, @NonNullDecl PlayerRef playerRef, @NonNullDecl World world) {
         NearbyCommand.execute(commandContext, store, ref, playerRef, world);

@@ -9,22 +9,16 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>1.3.0</revision>
+        <revision>1.3.3</revision>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <repositories>
-        <!-- Hytale release repository -->
-        <!-- <repository>
-            <id>hytale-release</id>
-            <url>https://maven.hytale.com/release</url>
-        </repository> -->
-        <!-- Hytale pre-release repository -->
         <repository>
             <id>hytale-release</id>
-            <url>https://maven.hytale.com/pre-release</url>
+            <url>https://maven.hytale.com/release</url>
         </repository>
     </repositories>
 
@@ -34,7 +28,7 @@
             <artifactId>Server</artifactId>
             <!-- Replace with latest version, we provide jars for the last five releases -->
             <!-- Source https://maven.hytale.com/release/com/hypixel/hytale/Server/maven-metadata.xml -->
-            <version>2026.02.26-7681d338c</version>
+            <version>0.5.3</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -23,6 +23,13 @@ These options can be found in the `Quickstacker.json` file located in the `steve
 *   `StackToPlayerRage` (default: 10) - The max range a player can be from the player to quick stack to. A negative value gives unlimited range.
 *   `IncludeHotbar` (default: false) - If true, quick stacking will also quick stack items on the players hot bar.
 
+## Permissions
+The following permissions can be added to a group:
+- steventhorne.quickstacker.command.quickstack (access to /quickstack, /qs)
+- steventhorne.quickstacker.command.playerstack (access to /playerstack)
+
+At this time, these commands do not prevent interracting with Quickstacker blocks.
+
 ## Troubleshooting
 
 ### I do not have permission to use the command

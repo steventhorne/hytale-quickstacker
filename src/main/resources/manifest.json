@@ -1,7 +1,7 @@
 {
   "Group": "steventhorne",
   "Name": "Quickstacker",
-  "Version": "1.3.0",
+  "Version": "1.3.3",
   "Description": "Adds the ability to quick stack to nearby inventories",
   "Authors": [
     {
@@ -12,7 +12,7 @@
   ],
   "Website": "https://github.com/steventhorne/hytale-quickstacker",
   "Main": "dev.sthorne.hytale.plugins.quickstacker.Plugin",
-  "ServerVersion": "2026.02.26-7681d338c",
+  "ServerVersion": ">=0.5.0",
   "Dependencies": {},
   "IncludesAssetPack": true,
   "DisabledByDefault": false

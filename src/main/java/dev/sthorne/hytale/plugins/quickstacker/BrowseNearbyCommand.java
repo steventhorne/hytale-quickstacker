@@ -19,6 +19,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -30,8 +31,12 @@ public class BrowseNearbyCommand extends AbstractPlayerCommand {
         super("browse", "Allows the player to browse all nearby chests at once.");
 
         Config = config;
+    }
 
-        setPermissionGroup(GameMode.Adventure);
+    @NullableDecl
+    @Override
+    protected String generatePermissionNode() {
+        return "browse";
     }
 
     @Override

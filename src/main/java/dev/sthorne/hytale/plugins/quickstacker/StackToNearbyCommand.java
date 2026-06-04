@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
@@ -16,22 +17,22 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.awt.*;
-import java.util.Arrays;
+import java.util.Objects;
 
 public class StackToNearbyCommand extends AbstractPlayerCommand {
-    private final Config<PluginConfig> Config;
-
-    public StackToNearbyCommand(Config<PluginConfig> config) {
+    public StackToNearbyCommand() {
         super("stack", "Quick stack to all nearby chests.\n\n/stack is deprecated and will be removed, please use one of the other aliases.");
         this.addAliases("cheststack", "cstack", "stackchest", "stackc");
+    }
 
-        Config = config;
-
-        setPermissionGroup(GameMode.Adventure);
+    @NullableDecl
+    @Override
+    protected String generatePermissionNode() {
+        return "quickstack";
     }
 
     @Override
@@ -43,18 +44,18 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
             commandContext.sendMessage(deprecationMessage);
         }
 
-        var srcPlayer = (Player)commandContext.sender();
+        var srcPlayer = (PlayerRef)commandContext.sender();
         quickStackToNearbyChests(srcPlayer);
     }
 
 
-    public static void quickStackToNearbyChests(Player player)
+    public static void quickStackToNearbyChests(PlayerRef playerRef)
     {
-        var ref = player.getReference();
+        var ref = playerRef.getReference();
         if (ref == null) return;
 
-        var playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
-        if (playerRef == null) return;
+        var player = ref.getStore().getComponent(ref, Player.getComponentType());
+        if (player == null) return;
 
         var world = player.getWorld();
         if (world == null) return;
@@ -92,10 +93,14 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
                     if (distance > maxRadius) continue;
 
                     ListTransaction<MoveTransaction<ItemStackTransaction>> transaction;
-                    if (Plugin.Config.get().GetIncludeHotbar())
-                        transaction = inventory.getCombinedHotbarFirst().quickStackTo(containerComponent.getItemContainer());
-                    else
-                        transaction = inventory.getStorage().quickStackTo(containerComponent.getItemContainer());
+                    if (Plugin.Config.get().GetIncludeHotbar()) {
+                        var inv = InventoryComponent.getCombined(ref.getStore(), ref, InventoryComponent.HOTBAR_FIRST);
+                        transaction = inv.quickStackTo(containerComponent.getItemContainer());
+                    }
+                    else {
+                        var inv = InventoryComponent.getCombined(ref.getStore(), ref, Objects.requireNonNull(InventoryComponent.getComponentTypeById(InventoryComponent.STORAGE_SECTION_ID)));
+                        transaction = inv.quickStackTo(containerComponent.getItemContainer());
+                    }
 
                     var change = Utils.GetMovedItemQuantityFromTransaction(transaction);
                     if (change > 0) chestCount++;
@@ -107,10 +112,10 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
         }
 
         if (availableChests <= 0)
-            player.sendMessage(Message.raw("There are no nearby chests."));
+            playerRef.sendMessage(Message.raw("There are no nearby chests."));
         else if (itemCount > 0)
-            player.sendMessage(Message.raw("Successfully quick stacked " + itemCount + " items to " + chestCount + " nearby chests."));
+            playerRef.sendMessage(Message.raw("Successfully quick stacked " + itemCount + " items to " + chestCount + " nearby chests."));
         else
-            player.sendMessage(Message.raw("No items capable of being quick stacked."));
+            playerRef.sendMessage(Message.raw("No items capable of being quick stacked."));
     }
 }
