@@ -1,11 +1,15 @@
 package dev.sthorne.hytale.plugins.quickstacker;
 
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
+import com.hypixel.hytale.server.core.modules.block.BlockModule;
+import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.World;
 
 public class Utils {
     public static TransformComponent GetPlayerTransform(Player player) {
@@ -15,6 +19,14 @@ public class Utils {
 
         var store = world.getEntityStore().getStore();
         return store.getComponent(playerRef, TransformComponent.getComponentType());
+    }
+
+    public static ItemContainer GetContainerAt(World world, int x, int y, int z) {
+        var blockRef = BlockModule.getBlockEntity(world, x, y, z);
+        if (blockRef == null) return null;
+
+        var component = blockRef.getStore().getComponent(blockRef, ItemContainerBlock.getComponentType());
+        return component == null ? null : component.getItemContainer();
     }
 
     public static Player GetPlayerFromRef(PlayerRef playerRef) {

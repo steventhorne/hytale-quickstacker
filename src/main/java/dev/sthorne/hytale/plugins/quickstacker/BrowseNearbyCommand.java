@@ -2,7 +2,6 @@ package dev.sthorne.hytale.plugins.quickstacker;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.protocol.packets.interface_.Page;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
@@ -12,10 +11,8 @@ import com.hypixel.hytale.server.core.entity.entities.player.windows.ContainerWi
 import com.hypixel.hytale.server.core.entity.entities.player.windows.Window;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -69,15 +66,8 @@ public class BrowseNearbyCommand extends AbstractPlayerCommand {
         for (int x = posX - maxRadius; x < posX + maxRadius; x++) {
             for (int y = posY - maxRadius; y < posY + maxRadius; y++) {
                 for (int z = posZ - maxRadius; z < posZ + maxRadius; z++) {
-                    WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(x, z));
-                    if (chunk == null) continue;
-
-                    var ref = chunk.getBlockComponentEntity(x, y, z);
-                    if (ref == null) continue;
-
-                    var store = ref.getStore();
-                    var containerComponent = store.getComponent(ref, ItemContainerBlock.getComponentType());
-                    if (containerComponent == null) continue;
+                    var container = Utils.GetContainerAt(world, x, y, z);
+                    if (container == null) continue;
 
                     var dx = posX - x;
                     var dy = posY - y;
@@ -85,7 +75,7 @@ public class BrowseNearbyCommand extends AbstractPlayerCommand {
                     var distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
                     if (distance > maxRadius) continue;
 
-                    containers.add(containerComponent.getItemContainer());
+                    containers.add(container);
                 }
             }
         }
