@@ -2,7 +2,6 @@ package dev.sthorne.hytale.plugins.quickstacker;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
@@ -12,10 +11,8 @@ import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
-import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
@@ -76,15 +73,8 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
         for (int x = posX - maxRadius; x < posX + maxRadius; x++) {
             for (int y = posY - maxRadius; y < posY + maxRadius; y++) {
                 for (int z = posZ - maxRadius; z < posZ + maxRadius; z++) {
-                    WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(x, z));
-                    if (chunk == null) continue;
-
-                    var blockRef = chunk.getBlockComponentEntity(x, y, z);
-                    if (blockRef == null) continue;
-
-                    var store = blockRef.getStore();
-                    var containerComponent = store.getComponent(blockRef, ItemContainerBlock.getComponentType());
-                    if (containerComponent == null) continue;
+                    var container = Utils.GetContainerAt(world, x, y, z);
+                    if (container == null) continue;
 
                     var dx = posX - x;
                     var dy = posY - y;
@@ -95,11 +85,11 @@ public class StackToNearbyCommand extends AbstractPlayerCommand {
                     ListTransaction<MoveTransaction<ItemStackTransaction>> transaction;
                     if (Plugin.Config.get().GetIncludeHotbar()) {
                         var inv = InventoryComponent.getCombined(ref.getStore(), ref, InventoryComponent.HOTBAR_FIRST);
-                        transaction = inv.quickStackTo(containerComponent.getItemContainer());
+                        transaction = inv.quickStackTo(container);
                     }
                     else {
                         var inv = InventoryComponent.getCombined(ref.getStore(), ref, Objects.requireNonNull(InventoryComponent.getComponentTypeById(InventoryComponent.STORAGE_SECTION_ID)));
-                        transaction = inv.quickStackTo(containerComponent.getItemContainer());
+                        transaction = inv.quickStackTo(container);
                     }
 
                     var change = Utils.GetMovedItemQuantityFromTransaction(transaction);
